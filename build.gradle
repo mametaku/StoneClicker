@@ -1,0 +1,78 @@
+apply plugin: 'java'
+apply plugin: 'kotlin'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+configurations {
+    embed
+    compile.extendsFrom(embed)
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'papermc-repo'
+        url = 'https://papermc.io/repo/repository/maven-public/'
+    }
+    maven {
+        name = 'spigotmc-repo'
+        url = 'https://hub.spigotmc.org/nexus/content/groups/public/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+    maven { url "https://repo.dmulloy2.net/nexus/repository/public/" }
+    maven { url 'https://jitpack.io' }
+    maven { url "https://maven.enginehub.org/repo/" }
+    maven {
+        name = 'nikl-repo'
+        url = 'http://repo.nikl.me/artifactory/public'
+    }
+
+}
+
+dependencies {
+    compile "com.destroystokyo.paper:paper-api:$spigot_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile fileTree(dir: 'libs', include: '*.jar')
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7'
+    compile 'org.mongodb:mongo-java-driver:3.12.7'
+    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+    compile 'me.nikl.nmsutilities:nmsutilities:1.4.2'
+}
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+import java.security.acl.Group
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+    main.java.srcDirs += 'src/main/java'
+}
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter ReplaceTokens, tokens: [version: version]
+    }
+}
+
+buildscript {
+    ext{
+        kotlin_version = '1.3.71'
+        spigot_version = '1.16.3-R0.1-SNAPSHOT'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+jar {
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}

@@ -1,0 +1,6 @@
+name: StoneClicker
+version: @version@
+main: red.man10.stoneclicker.StoneClicker
+api-version: 1.16
+commands:
+  stoneclicker:
